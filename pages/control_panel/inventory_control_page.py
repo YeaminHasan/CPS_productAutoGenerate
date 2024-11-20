@@ -1,10 +1,106 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import time
 
+
+class Inventory_Control_Page:
+    def __init__(self, driver):
+        self.driver = driver
+        self.wait = WebDriverWait(self.driver, 10)
+
+        # Inventory Control
+        self.inventory_control_button = (By.XPATH, "//mat-tree-node[normalize-space()='Inventory Control']")
+        self.header_text = (By.XPATH, "/html/body/aes-editor-root/aes-page/div[2]/aes-editor-navbar/h1")
+
+    # Inventory Control
+    def click_inventory_control_button(self):
+        self.wait.until(EC.element_to_be_clickable(self.inventory_control_button)).click()
+    def is_inventory_control_button_visible(self):
+        button = self.wait.until(EC.element_to_be_clickable(self.inventory_control_button))
+        return button.is_displayed(), button.text
+    def is_header_text_displayed(self):
+        header = WebDriverWait(self.driver,5).until(EC.element_to_be_clickable(self.header_text))
+        return header.is_displayed(), header.text
+    
+class Add_Category_page:
+    def __init__(self, driver):
+        self.driver = driver
+        self.wait = WebDriverWait(self.driver, 5)
+
+        # Add New Category
+        self.add_category_button = (By.XPATH, "//span[normalize-space()='Add New Category']")
+        self.add_category_card_header = (By.XPATH, "//h2[contains(@class, 'mat-mdc-dialog-title') and text()='Add Category']")
+        self.prefix_text = (By.XPATH, "//label[normalize-space()='Prefix']")
+        self.prefix_dropdown = (By.ID, "mat-select-2")
+        self.category_name_text = (By.XPATH, "//label[normalize-space()='Category Name']")
+        self.category_name_field = (By.XPATH, "//input[@placeholder='Enter Category Name']")
+        self.category_code_text = (By.XPATH, "//label[normalize-space()='Category Code']")
+        self.category_code_field = (By.XPATH, "//input[@formcontrolname='code']")
+        self.cancel_button = (By.XPATH, "//span[normalize-space()='Cancel']")
+        self.save_button = (By.XPATH, "//span[normalize-space()='Save']")
+        self.toast_message = (By.CLASS_NAME, "mat-mdc-snack-bar-container")
+
+
+    # Add New Category
+    def click_add_new_category_button(self):
+        self.wait.until(EC.element_to_be_clickable(self.add_category_button)).click()
+    def is_add_new_category_button_displayed(self):
+        button = self.wait.until(EC.element_to_be_clickable(self.add_category_button))
+        return button.is_displayed(), button.text
+    # Card View - Add New Category
+    def is_add_category_card_header_displayed(self):
+        ht = self.wait.until(EC.element_to_be_clickable(self.add_category_card_header))
+        return ht.is_displayed(), ht.text
+    # Prefix
+    def is_prefix_text_displayed(self):
+        prefix_text = self.wait.until(EC.element_to_be_clickable(self.prefix_text))
+        return prefix_text.is_displayed(), prefix_text.text
+    def select_prefix(self, option_text):
+        text = ''
+        if (option_text == 'P') or (option_text == 'p') or (option_text == 'Own Product'):
+            text = 'Own Product'
+        elif (option_text == 'S') or (option_text == 's') or (option_text == 'Outsourcing'):
+            text = 'Outsourcing'
+
+        self.wait.until(EC.element_to_be_clickable(self.prefix_dropdown)).click()
+        option_xpath = f"//span[contains(text(),'{text}')]"
+        option_to_select = self.wait.until(EC.element_to_be_clickable((By.XPATH, option_xpath)))
+        option_to_select.click()
+    # Category Name
+    def is_category_name_text_displayed(self):
+        cn_text = self.wait.until(EC.element_to_be_clickable(self.category_name_text))
+        return cn_text.is_displayed(), cn_text.text
+    def enter_category_name(self, c_name):
+        self.wait.until(EC.element_to_be_clickable(self.category_name_field)).send_keys(c_name)
+    # Category Code
+    def is_category_code_text_displayed(self):
+        cn_text = self.wait.until(EC.element_to_be_clickable(self.category_code_text))
+        return cn_text.is_displayed(), cn_text.text
+    def get_category_code(self):
+        input_element = self.wait.until(EC.element_to_be_clickable(self.category_code_field))
+        input_value = input_element.get_attribute("value")
+        if (len(input_value) >= 3):
+            return input_value
+    # Cancel Button
+    def click_cancel_button(self):
+        self.wait.until(EC.element_to_be_clickable(self.cancel_button)).click()
+    def is_cancel_button_visible(self):
+        button = self.wait.until(EC.element_to_be_clickable(self.cancel_button))
+        return button.is_displayed(), button.text
+    # Save Button
+    def click_save_button(self):
+        self.wait.until(EC.element_to_be_clickable(self.save_button)).click()
+    def is_save_button_visible(self):
+        button = self.wait.until(EC.element_to_be_clickable(self.save_button))
+        return button.is_displayed(), button.text
+    # Error Message
+    def is_toast_message_show(self):
+        toast = self.wait.until(EC.element_to_be_clickable(self.toast_message))
+        return toast.text, toast.is_displayed()
 
 class Category_Handler_page:
     def __init__(self, driver):
@@ -54,37 +150,37 @@ class Category_Handler_page:
             except Exception:
                 break
 
-    # def category_edit(self, category_text):
-    #     while True:
-    #         flag = 0
-    #         # wait
-    #         self.wait.until(EC.presence_of_all_elements_located(self.rows_element))
-    #         rows = self.driver.find_elements(*self.rows_element)
-    #         for row in rows:
-    #             current_category_name = row.find_element(*self.category_element).text.strip()
-    #             category = current_category_name.split(" - ")
-    #             category_code = category[0]
-    #             category_name = category[1]
-    #             if category_name.lower() == category_text.lower():
-    #                 # Action Area
-    #                 edit_icon = row.find_element(*self.edit_icon_element_Dyn)
-    #                 edit_icon.click()
-    #                 flag = 1
-    #                 break
+    def category_edit(self, category_text):
+        while True:
+            flag = 0
+            # wait
+            self.wait.until(EC.presence_of_all_elements_located(self.rows_element))
+            rows = self.driver.find_elements(*self.rows_element)
+            for row in rows:
+                current_category_name = row.find_element(*self.category_element).text.strip()
+                category = current_category_name.split(" - ")
+                category_code = category[0]
+                category_name = category[1]
+                if category_name.lower() == category_text.lower():
+                    # Action Area
+                    edit_icon = row.find_element(*self.edit_icon_element_Dyn)
+                    edit_icon.click()
+                    flag = 1
+                    break
 
-    #         try:
-    #             if flag == 0:
-    #                 next_button = self.wait.until(EC.element_to_be_clickable(self.next_button_element))
-    #                 if next_button.is_enabled():
-    #                     next_button.click()
-    #                 else:
-    #                     break
-    #             elif flag == 1:
-    #                 break
-    #         except Exception:
-    #             break
+            try:
+                if flag == 0:
+                    next_button = self.wait.until(EC.element_to_be_clickable(self.next_button_element))
+                    if next_button.is_enabled():
+                        next_button.click()
+                    else:
+                        break
+                elif flag == 1:
+                    break
+            except Exception:
+                break
 
-    # def category_delete(self, category_text):
+    def category_delete(self, category_text):
         while True:
             flag = 0
             # wait
@@ -192,7 +288,7 @@ class Sub_Category_Handler_page:
         return sub_category_name_list
 
    
-    def generate_product(self, subC_list, f, f2):
+    def generate_product(self, subC_list, f):
         sub_category_name_list = subC_list
         
         # Page Count
@@ -217,7 +313,7 @@ class Sub_Category_Handler_page:
             for row in rows:
                 current_sub_category_name = row.find_element(*self.sub_category_name_element).text.strip()
                 
-                if (current_sub_category_name == sub_category_name_list[f]) and (f <= f2):
+                if current_sub_category_name == sub_category_name_list[f]:
                     print(current_sub_category_name)
                     right_arrow_icon = row.find_element(*self.sub_right_arrow_element_Dyn)
                     right_arrow_icon.click()
@@ -358,4 +454,65 @@ class Sub_Category_Handler_page:
                 print("Generate Button not Active")
                 print("Product not Generate")
 
-        
+            
+
+            
+
+            
+
+
+            
+
+
+
+
+
+
+
+
+    # def test_but_final(self):
+    #     sub_category_name_list = []
+    #     while True:
+    #         flag = 0
+    #         # wait
+    #         self.wait.until(EC.presence_of_all_elements_located(self.sub_rows_element))
+    #         time.sleep(1)
+    #         rows = self.driver.find_elements(*self.sub_rows_element)
+    #         f = 0
+    #         for row in rows:
+    #             current_sub_category_name = row.find_element(*self.sub_category_name_element).text.strip()
+    #             # sub_category = current_sub_category_name.split(" - ")
+    #             # sub_category_code = sub_category[0]
+    #             # sub_category_name = sub_category[1]
+    #             # sub_category_name_list.append(current_sub_category_name)
+    #             # print(current_sub_category_name)
+    #             # Condition Area
+    #             if current_sub_category_name == 'SE1-B2 - Bulb':
+    #                 print(current_sub_category_name)
+    #                 right_arrow_icon = row.find_element(*self.sub_right_arrow_element_Dyn)
+    #                 right_arrow_icon.click()
+    #                 flag = 1
+    #                 auto_generate_product = self.wait.until(EC.element_to_be_clickable(self.generate_product_element))
+    #                 auto_generate_product.click()
+    #                 break
+
+
+    #             # if category_name.lower() == category_text.lower():
+    #             #     # Action Area
+    #             #     right_arrow_icon = row.find_element(*self.right_arrow_element_Dyn)
+    #             #     right_arrow_icon.click()
+    #             #     flag = 1
+    #             #     break
+    #         time.sleep(2)
+    #         # print(sub_category_name_list)
+    #         try:
+    #             if flag == 0:
+    #                 next_button = self.wait.until(EC.element_to_be_clickable(self.sub_next_button_element))
+    #                 if next_button.is_enabled():
+    #                     next_button.click()
+    #                 else:
+    #                     break
+    #             elif flag == 1:
+    #                 break
+    #         except Exception:
+    #             break

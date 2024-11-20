@@ -27,7 +27,7 @@ login_page.click_login_button()
 time.sleep(3)
 driver.get("http://172.17.17.27/editor/control-panel/category")
 # Give Category Name to Auto Generating Products
-selected_category_name = "Low value"
+selected_category_name = "Transport"
 category.category_to_subCategory(selected_category_name)
 
 # Store subCategory Name
