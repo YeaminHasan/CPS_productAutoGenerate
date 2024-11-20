@@ -213,6 +213,7 @@ class Category_Handler_page:
     def category_to_subCategory(self, category_text):
         while True:
             flag = 0
+            time.sleep(2)
             # wait
             self.wait.until(EC.presence_of_all_elements_located(self.rows_element))
             rows = self.driver.find_elements(*self.rows_element)
@@ -230,6 +231,7 @@ class Category_Handler_page:
 
             try:
                 if flag == 0:
+                    time.sleep(1)
                     next_button = self.wait.until(EC.element_to_be_clickable(self.next_button_element))
                     if next_button.is_enabled():
                         next_button.click()

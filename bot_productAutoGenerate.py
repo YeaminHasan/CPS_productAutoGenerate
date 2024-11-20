@@ -34,13 +34,17 @@ category.category_to_subCategory(selected_category_name)
 sub_list = subCategory.store_all_subCategory_in_list()
 # print(sub_list)
 
-f = 0
+f = 81
+f_max = 100
 driver.get("http://172.17.17.27/editor/control-panel/category")
 category.category_to_subCategory(selected_category_name)
 for item in sub_list:
     print(f"Now creating {f} No subCategory Products")
     time.sleep(2)
     subCategory.generate_product(sub_list,f)
+    if f == f_max:
+        print(f"{f_max} == {f}")
+        break
     f = f+1
     driver.get("http://172.17.17.27/editor/control-panel/category")
     # Give Category Name to Auto Generating Products
